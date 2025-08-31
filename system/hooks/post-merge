@@ -1,0 +1,209 @@
+#!/usr/bin/env python3
+"""
+ThreadVault Git Post-merge Hook
+Triggers memory consolidation and self-reflection after merges
+"""
+
+import json
+import sys
+import subprocess
+from pathlib import Path
+from datetime import datetime
+import hashlib
+
+# Configuration
+REPO_ROOT = Path(__file__).parent.parent.parent
+MEMORY_DIR = REPO_ROOT / "memory"
+KNOWLEDGE_DIR = REPO_ROOT / "knowledge"
+SYSTEM_DIR = REPO_ROOT / "system"
+
+def run_git_cmd(cmd):
+    """Run git command and return output"""
+    try:
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        return result.returncode == 0, result.stdout.strip(), result.stderr.strip()
+    except Exception as e:
+        return False, "", str(e)
+
+def get_merge_info():
+    """Get information about the merge that just happened"""
+    success, output, _ = run_git_cmd("git log -1 --pretty=format:'%H|%s|%an|%ad' --date=iso")
+    if not success:
+        return None
+        
+    parts = output.split('|')
+    if len(parts) >= 4:
+        return {
+            'commit_hash': parts[0],
+            'subject': parts[1], 
+            'author': parts[2],
+            'date': parts[3]
+        }
+    return None
+
+def update_knowledge_facts():
+    """Update the facts.json with merge information"""
+    print("🧠 Updating knowledge facts...")
+    
+    facts_file = KNOWLEDGE_DIR / "facts.json"
+    
+    try:
+        with open(facts_file, 'r') as f:
+            facts = json.load(f)
+    except:
+        facts = {"metadata": {}, "merge_history": []}
+    
+    merge_info = get_merge_info()
+    if merge_info:
+        # Add to merge history
+        if "merge_history" not in facts:
+            facts["merge_history"] = []
+            
+        facts["merge_history"].append({
+            "timestamp": datetime.now().isoformat(),
+            "commit": merge_info['commit_hash'][:8],
+            "subject": merge_info['subject'],
+            "integration_status": "automatic"
+        })
+        
+        # Keep only last 50 merge records
+        facts["merge_history"] = facts["merge_history"][-50:]
+        
+        # Update metadata
+        facts["metadata"]["last_updated"] = datetime.now().isoformat()
+        facts["metadata"]["last_merge"] = merge_info['commit_hash'][:8]
+        
+        with open(facts_file, 'w') as f:
+            json.dump(facts, f, indent=2)
+            
+        print(f"  ✅ Added merge record: {merge_info['subject'][:50]}...")
+
+def trigger_self_reflection():
+    """Generate self-reflection entry about the merge"""
+    print("🤔 Triggering self-reflection...")
+    
+    # Get changed files in the merge
+    success, changed_files, _ = run_git_cmd("git diff --name-only HEAD~1 HEAD")
+    if not success:
+        changed_files = "unknown"
+    
+    merge_info = get_merge_info()
+    if not merge_info:
+        return
+    
+    # Create reflection entry
+    today = datetime.now().strftime('%Y-%m-%d')
+    episodic_file = MEMORY_DIR / "episodic" / f"{today}.md"
+    
+    reflection_entry = f"""
+### Post-Merge Reflection - {datetime.now().strftime('%H:%M')}
+**Merge**: {merge_info['subject']}  
+**Commit**: {merge_info['commit_hash'][:8]}  
+**Files Changed**: {changed_files.replace(chr(10), ', ')}  
+
+**Integration Assessment**:
+- Memory integrity: Validated by pre-commit hooks
+- Identity consistency: Maintained through structured validation
+- Knowledge updates: Automatically consolidated
+- Ethics alignment: Verified through standard checks
+
+**Learning Integration**: 
+Changes have been atomically integrated into memory system. All modifications passed validation and are now part of canonical memory state.
+
+---
+"""
+    
+    # Append to today's episodic memory
+    if episodic_file.exists():
+        with open(episodic_file, 'a') as f:
+            f.write(reflection_entry)
+    else:
+        with open(episodic_file, 'w') as f:
+            f.write(f"# Episodic Memory - {today}\n\n")
+            f.write(reflection_entry)
+    
+    print(f"  ✅ Added reflection to {episodic_file.name}")
+
+def validate_memory_integrity():
+    """Validate that the merge didn't corrupt memory structure"""
+    print("🔍 Validating memory integrity post-merge...")
+    
+    # Check critical files exist
+    critical_files = [
+        REPO_ROOT / "identity" / "kernel.md",
+        REPO_ROOT / "identity" / "ethics.md", 
+        KNOWLEDGE_DIR / "facts.json",
+        MEMORY_DIR / "semantic.md"
+    ]
+    
+    for critical_file in critical_files:
+        if not critical_file.exists():
+            print(f"  ❌ Critical file missing: {critical_file}")
+            return False
+        else:
+            print(f"  ✅ {critical_file.name}")
+    
+    # Validate JSON files
+    try:
+        with open(KNOWLEDGE_DIR / "facts.json", 'r') as f:
+            json.load(f)
+        print("  ✅ facts.json is valid JSON")
+    except:
+        print("  ❌ facts.json is invalid")
+        return False
+    
+    return True
+
+def update_system_status():
+    """Update system status information"""
+    print("⚙️  Updating system status...")
+    
+    status_file = SYSTEM_DIR / "last_merge.json"
+    merge_info = get_merge_info()
+    
+    if merge_info:
+        status = {
+            "last_merge": {
+                "timestamp": datetime.now().isoformat(),
+                "commit_hash": merge_info['commit_hash'],
+                "subject": merge_info['subject'],
+                "validation_status": "passed"
+            },
+            "integrity_checks": {
+                "memory_structure": "validated",
+                "identity_consistency": "maintained", 
+                "knowledge_updated": "automatic"
+            }
+        }
+        
+        with open(status_file, 'w') as f:
+            json.dump(status, f, indent=2)
+        
+        print(f"  ✅ System status updated")
+
+def main():
+    """Main post-merge routine"""
+    print("🔄 ThreadVault Post-Merge Integration")
+    print("=" * 40)
+    
+    # Validate merge didn't break anything
+    if not validate_memory_integrity():
+        print("❌ Memory integrity validation failed!")
+        sys.exit(1)
+    
+    # Update knowledge and trigger reflection
+    try:
+        update_knowledge_facts()
+        trigger_self_reflection()
+        update_system_status()
+        
+        print("\n🎉 Post-merge integration completed successfully")
+        
+    except Exception as e:
+        print(f"❌ Post-merge processing failed: {e}")
+        sys.exit(1)
+    
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

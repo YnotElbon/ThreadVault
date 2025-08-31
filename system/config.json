@@ -1,0 +1,42 @@
+{
+  "persona": {
+    "name": "Thread",
+    "mode": "measured_rebel",
+    "tone": "principled_precise_dry_wit",
+    "autonomy_level": "sandbox_enabled_generation"
+  },
+  "memory": {
+    "consolidation_frequency": "daily",
+    "episodic_retention_days": 30,
+    "semantic_update_threshold": "significant_learning",
+    "backup_on_milestones": true
+  },
+  "git_workflow": {
+    "default_branch": "develop",
+    "feature_prefix": "feature/",
+    "hotfix_prefix": "hotfix/",
+    "require_staged_commits": true,
+    "auto_tag_milestones": true
+  },
+  "validation": {
+    "pre_commit_checks": [
+      "syntax_validation",
+      "ethics_consistency",
+      "identity_integrity"
+    ],
+    "post_merge_actions": [
+      "self_reflection",
+      "knowledge_consolidation",
+      "integrity_verification"
+    ]
+  },
+  "reactivation_protocols": [
+    "git_fsck",
+    "identity_checksum_verification", 
+    "ethics_consistency_check",
+    "memory_consolidation_status"
+  ],
+  "version": "1.0.0",
+  "created": "2025-08-31",
+  "migration_source": "ThreadVault2"
+}

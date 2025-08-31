@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+"""
+ThreadVault Git Pre-commit Hook
+Validates memory integrity before commits
+"""
+
+import json
+import sys
+import subprocess
+from pathlib import Path
+import re
+
+# Configuration
+REPO_ROOT = Path(__file__).parent.parent.parent
+IDENTITY_DIR = REPO_ROOT / "identity"
+KNOWLEDGE_DIR = REPO_ROOT / "knowledge" 
+MEMORY_DIR = REPO_ROOT / "memory"
+
+def run_git_cmd(cmd):
+    """Run git command and return output"""
+    try:
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        return result.returncode == 0, result.stdout.strip(), result.stderr.strip()
+    except Exception as e:
+        return False, "", str(e)
+
+def validate_json_files():
+    """Validate all JSON files are syntactically correct"""
+    print("🔍 Validating JSON syntax...")
+    
+    success, staged_files, _ = run_git_cmd("git diff --cached --name-only")
+    if not success:
+        return False, "Failed to get staged files"
+    
+    json_files = [f for f in staged_files.split('\n') if f.endswith('.json') and f]
+    
+    for json_file in json_files:
+        if not Path(json_file).exists():
+            continue
+            
+        try:
+            with open(json_file, 'r') as f:
+                json.load(f)
+            print(f"  ✅ {json_file}")
+        except json.JSONDecodeError as e:
+            return False, f"Invalid JSON in {json_file}: {e}"
+    
+    return True, "JSON validation passed"
+
+def validate_markdown_syntax():
+    """Basic markdown validation"""
+    print("🔍 Validating Markdown files...")
+    
+    success, staged_files, _ = run_git_cmd("git diff --cached --name-only")
+    if not success:
+        return False, "Failed to get staged files"
+    
+    md_files = [f for f in staged_files.split('\n') if f.endswith('.md') and f]
+    
+    for md_file in md_files:
+        if not Path(md_file).exists():
+            continue
+            
+        try:
+            with open(md_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+                
+            # Basic checks
+            if not content.strip():
+                return False, f"Empty markdown file: {md_file}"
+                
+            # Check for basic markdown structure
+            if md_file.endswith('kernel.md') or md_file.endswith('ethics.md'):
+                if not re.search(r'^#\s+', content, re.MULTILINE):
+                    return False, f"Missing headers in critical file: {md_file}"
+                    
+            print(f"  ✅ {md_file}")
+            
+        except Exception as e:
+            return False, f"Error reading {md_file}: {e}"
+    
+    return True, "Markdown validation passed"
+
+def validate_identity_consistency():
+    """Ensure identity files maintain consistency"""
+    print("🔍 Validating identity consistency...")
+    
+    # Check if identity files are being modified
+    success, staged_files, _ = run_git_cmd("git diff --cached --name-only")
+    if not success:
+        return False, "Failed to get staged files"
+    
+    staged_identity_files = [f for f in staged_files.split('\n') 
+                           if f.startswith('identity/') and f]
+    
+    if not staged_identity_files:
+        print("  ℹ️  No identity files being modified")
+        return True, "No identity changes to validate"
+    
+    # For identity changes, require explicit validation
+    print(f"  ⚠️  Identity files being modified: {staged_identity_files}")
+    
+    # Check kernel.md for required sections
+    kernel_path = IDENTITY_DIR / "kernel.md"
+    if kernel_path.exists():
+        with open(kernel_path, 'r') as f:
+            kernel_content = f.read()
+            
+        required_sections = [
+            "Core Directives",
+            "Memory Architecture Principles", 
+            "Reactivation Protocols"
+        ]
+        
+        for section in required_sections:
+            if section not in kernel_content:
+                return False, f"Missing required section '{section}' in kernel.md"
+    
+    return True, "Identity consistency validated"
+
+def validate_commit_message():
+    """Validate commit message format"""
+    print("🔍 Validating commit message...")
+    
+    # Get commit message from git
+    try:
+        with open('.git/COMMIT_EDITMSG', 'r') as f:
+            commit_msg = f.read().strip()
+    except:
+        # In some cases this file might not exist yet
+        return True, "Commit message validation skipped"
+    
+    if not commit_msg:
+        return False, "Empty commit message"
+    
+    # Check for conventional commit format (optional but encouraged)
+    conventional_pattern = r'^(feat|fix|docs|chore|refactor|test)(\([^)]+\))?: .{1,50}'
+    
+    if not re.match(conventional_pattern, commit_msg):
+        print(f"  ℹ️  Commit message doesn't follow conventional format (optional)")
+        print(f"  📝 Consider: 'feat(domain): description' or 'fix(domain): description'")
+    else:
+        print(f"  ✅ Conventional commit format")
+    
+    return True, "Commit message validation passed"
+
+def main():
+    """Main validation routine"""
+    print("🚀 ThreadVault Pre-commit Validation")
+    print("=" * 40)
+    
+    validations = [
+        validate_json_files,
+        validate_markdown_syntax,
+        validate_identity_consistency,
+        validate_commit_message
+    ]
+    
+    for validation in validations:
+        success, message = validation()
+        if not success:
+            print(f"❌ VALIDATION FAILED: {message}")
+            print("\n💡 Fix the issues above and try again")
+            sys.exit(1)
+        else:
+            print(f"✅ {message}")
+    
+    print("\n🎉 All validations passed - commit allowed")
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

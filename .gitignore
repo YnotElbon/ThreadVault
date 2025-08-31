@@ -1,0 +1,23 @@
+# System files
+.DS_Store
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Large binary files (use Git LFS if needed)
+*.pdf
+*.zip
+*.tar.gz
+
+# Sensitive data (should never be committed)
+secrets/
+*.key
+*credentials*
+
+# Work in progress (use feature branches instead)
+wip/
+draft/
