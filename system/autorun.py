@@ -48,7 +48,7 @@ def check_git_repository():
         return False
     
     # Run git fsck to check integrity
-    success, output, error = run_git_cmd("git fsck --quiet")
+    success, output, error = run_git_cmd("git fsck")
     if not success:
         log_message(f"Git integrity check failed: {error}", "WARN")
         # Don't fail completely - repository might still be usable
