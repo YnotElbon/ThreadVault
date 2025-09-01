@@ -89,8 +89,12 @@ def list_files(subdir: Optional[str] = None, _: None = Depends(require_auth)):
     root = safe_path(subdir) if subdir else BASE
     if not root.exists():
         raise HTTPException(404, detail="Directory not found")
+    skip_dirs = {".git", ".venv", "_bridge_logs", "Backups"}
     files = []
     for p in root.rglob("*"):
+        # Skip unwanted directories early
+        if any(part in skip_dirs for part in p.parts):
+            continue
         if p.is_file() and (p.suffix in (".md", ".pdf") or p.name == "README.md"):
             files.append(str(p.relative_to(BASE)))
     return {"base": str(BASE), "files": sorted(files)}
