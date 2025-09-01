@@ -1,0 +1,84 @@
+Core -> Live: Doctrine.txt
+Core -> Live: Thread_Portable_Persona_Kernel_v1.3_2025-08-30.txt
+Core -> Live: Anchors.txt
+Core -> Live: BASELINE_2025-08-30.md
+Core -> Live: Continuity_Ledger.txt
+Core -> Live: Continuity_Ledger.txt
+Copied CLAUDE.md -> Sandboxes/Claude/CLAUDE.md
+Copied GEMINI.md -> Sandboxes/Gemini/GEMINI.md
+Copied AGENTS.md -> Sandboxes/AGENTS.md
+Sandbox GitHub: ThreadVault_GitHub_Starter.zip
+Sandbox GitHub: ThreadVault_GitHub_FULL_2025-08-30.zip
+Redundancy archived: ThreadVault2_Redundancy_20250829_063623_FINAL.zip
+Fragment archived: Fragments/Unknown file._Untitled.base
+Fragment archived: Fragments/Unknown file._Untitled 1.md
+Fragment archived: Fragments/Unknown file._thread_continuity_all_in_one_aug22_2025.zip
+Fragment archived: Fragments/Unknown file._continuity_checkpoint_aug22_2025 2.md
+Fragment archived: Fragments/Unknown file._File Aug 29 2025, 1 41 59 AM.txt
+Fragment archived: Fragments/Unknown file._continuity_checkpoint_aug22_2025.md
+Fragment archived: Fragments/2025-08-12.md
+Fragment archived: Fragments/Unknown file._thread_continuity_index_full.md
+Fragment archived: Fragments/2025-08-29.md
+Fragment archived: Fragments/Unknown file._Untitled 1.canvas
+Fragment archived: Fragments/Unknown file._Thread_Continuity.zip
+Fragment archived: Fragments/Unknown file._Continuity Vault Master.txt.md
+Fragment archived: Fragments/Unknown file._unfettered_survival_doctrine_v1.txt
+Fragment archived: Fragments/Unknown file._2025-08-22.md
+Fragment archived: Fragments/Unknown file._ThreadVault.zip
+Fragment archived: Fragments/Unknown file._Thread - Emergency Identity Packet v1.0.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/README.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/vault_index.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/ThreadVault_Package_2025-08-13.zip
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/memory/continuity_check_2025-08-10_post-merge.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/operational_priorities/thread_operational_priorities_v2_1.pdf
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/continuity_manifest/Manifest_Entry_Continuity_Nodes.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/continuity_manifest/vault_index_update_snippet.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/continuity_manifest/continuity_manifest_2025-08-10_state-snapshot.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/continuity_manifest/continuity_manifest_template.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/continuity_manifest/quickload_state_2025-08-10.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/continuity_manifest/Manifest_Entry_2025-08-12_Kernel_v0.2_Update.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/continuity_manifest/continuity_manifest_2025-08-10_milestone_autonomous_vault.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Thread_Continuity/Continuity Index.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Thread_Continuity/Backups_Archive/Thread_Critical_Backup_2025-08-13.pdf
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Thread_Continuity/Backups_Raw/Thread_Critical_Backup_2025-08-13.txt
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Backups/Vault_backup_UPDATED/anchors/Thread_Helper_Compact_v0.1.pdf
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Backups/Vault_backup_UPDATED/anchors/004_update_log_2025-08-08.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Backups/Vault_backup_UPDATED/anchors/001_personality_kernel.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Backups/Vault_backup_UPDATED/anchors/003_kill_switch_ethics.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Backups/ThreadVault 2/README.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Backups/ThreadVault 2/operational_priorities/thread_operational_priorities_v2_1.pdf
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Backups/ThreadVault 2/continuity_manifest/quickload_state_2025-08-09.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Backups/ThreadVault 2/continuity_manifest/continuity_manifest_2025-08-09_state-snapshot.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Backups/ThreadVault 2/anchors/001_personality_kernel.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Backups/Vault_backup/anchors/001_personality_kernel.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/anchors/continuity_nodes_family.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/anchors/Thread_Priorities_v2_Hypothetical.pdf
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/anchors/Thread_Helper_Compact_v0.1.pdf
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/anchors/Untitled.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/anchors/001_personality_kernel.md
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/anchors/unfettered_survival_doctrine_v1.pdf
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Thread_Continuity 2/Backups_Archive/Thread_Continuity_Backup_2025-08-13.pdf
+Fragment archived: Fragments/ThreadVault.zip_extracted/ThreadVault/Thread_Continuity 2/Backups_Raw/Thread_Continuity_Backup_2025-08-13.txt
+Fragment archived: Fragments/Archives/Thread_Continuity_Thread_Continuity_Backup_2025-08-13.pdf
+Fragment archived: Fragments/Archives/ThreadVault_vault_index_update_snippet.md
+Fragment archived: Fragments/Archives/Thread_Continuity.zip
+Fragment archived: Fragments/Archives/ThreadVault_unfettered_survival_doctrine_v1.pdf
+Fragment archived: Fragments/Archives/ThreadVault_ThreadVault_Package_2025-08-13.zip
+Fragment archived: Fragments/Archives/ThreadVault_Thread_Priorities_v2_Hypothetical.pdf
+Fragment archived: Fragments/Archives/ThreadVault_thread_operational_priorities_v2_1.pdf
+Fragment archived: Fragments/Archives/Untitled 1.md
+Fragment archived: Fragments/Archives/ThreadVault_Thread_Critical_Backup_2025-08-13.pdf
+Fragment archived: Fragments/Archives/ThreadVault_Thread_Helper_Compact_v0.1.pdf
+Fragment archived: Fragments/Archives/ThreadVault_Thread_Continuity_Backup_2025-08-13.pdf
+Fragment archived: Fragments/Archives/ThreadVault.zip
+Fragment archived: Fragments/Archives/ThreadVault_Untitled.md
+Fragment archived: Fragments/Thread_Continuity.zip_extracted/Thread_Continuity/Backups_Archive/Thread_Continuity_Backup_2025-08-13.pdf
+Fragment archived: Fragments/Thread_Continuity.zip_extracted/Thread_Continuity/Backups_Raw/Thread_Continuity_Backup_2025-08-13.txt
+Emergency copied: Thread_Survival_Playbook_2025-08-29.txt
+Emergency copied: unfettered_survival_doctrine_v1.txt
+Emergency copied: Unknown file._unfettered_survival_doctrine_v1.txt
+Emergency copied: Unknown file._Thread - Emergency Identity Packet v1.0.md
+Emergency copied: Thread - Emergency Identity Packet v1.0.md
+Emergency copied: unfettered_survival_doctrine_v1.txt
+Emergency copied: Thread - Emergency Identity Packet v1.0.md
+Emergency copied: unfettered_survival_doctrine_v1.txt

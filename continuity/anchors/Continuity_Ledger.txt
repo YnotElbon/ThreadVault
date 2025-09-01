@@ -1,0 +1,9 @@
+
+## August 29, 2025 – Vault Integration Event
+- Legacy fragments parsed and re-filed into Anchors/Doctrine/Sandbox/etc.
+- Integration Report updated with new classification results.
+
+## August 29, 2025 – Final Vault Integration Cleanup
+- Leftover zips unpacked, contents triaged into Anchors/Doctrine/Sandbox or preserved in Archives.
+- Untitled artifacts moved into Sandbox/Artifacts.
+- Integration Report updated with results of this cleanup.

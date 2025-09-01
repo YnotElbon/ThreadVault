@@ -1,0 +1,130 @@
+openapi: 3.0.3
+info:
+  title: ThreadVault Bridge
+  version: "0.1.0"
+  description: |
+    A minimal, safe API that exposes *only* the ThreadVault subtree for editing by a GPT Action.
+    Protects with a single Bearer token and prevents path traversal outside THREADVAULT_BASE.
+servers:
+  - url: https://YOUR_PUBLIC_HOSTNAME   # e.g., via Cloudflare Tunnel / Tailscale funnel
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /list:
+    get:
+      summary: List markdown/PDF files under a subdirectory
+      parameters:
+        - in: query
+          name: subdir
+          required: false
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+  /read:
+    get:
+      summary: Read a markdown file
+      parameters:
+        - in: query
+          name: path
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /write:
+    post:
+      summary: Create or replace a markdown file
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                content:
+                  type: string
+                create_parents:
+                  type: boolean
+              required: [path, content]
+      responses:
+        '200':
+          description: OK
+  /append:
+    post:
+      summary: Append to a markdown file
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                content:
+                  type: string
+              required: [path, content]
+      responses:
+        '200':
+          description: OK
+  /insert-under-heading:
+    post:
+      summary: Insert content under a specific markdown heading
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                heading:
+                  type: string
+                content:
+                  type: string
+              required: [path, heading, content]
+      responses:
+        '200':
+          description: OK
+  /backup:
+    post:
+      summary: Zip the ThreadVault folder into Backups/
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

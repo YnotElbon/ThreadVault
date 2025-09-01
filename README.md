@@ -13,14 +13,29 @@ A Git-based memory and continuity system for AI assistants, evolved from the ori
 - **`knowledge/`** - Structured information and learned skills
   - `facts.json` - Discrete, verified facts
   - `skills/` - Learned capabilities and code snippets
+  - `frameworks/` - Operational excellence and testing frameworks
+  - `playbooks/` - Situational response playbooks
 
 - **`memory/`** - Active memory and experience logs
   - `episodic/` - Daily/session-based raw experience logs
   - `semantic.md` - Consolidated understanding derived from experiences
 
+- **`continuity/`** - Thread continuity preservation system
+  - `anchors/` - Core continuity anchors and identity preservation
+  - `emergency/` - Emergency protocols and recovery procedures
+  - `ledger.md` - Continuity tracking and documentation
+
+- **`tools/`** - Utilities and integration tools
+  - `scripts/` - Build tools and automation scripts
+  - `bridges/` - API connectors and integration utilities
+
 - **`system/`** - System configuration and automation
   - `hooks/` - Git hooks for automated memory management
   - `config.json` - Current persona configuration
+  - `autorun.py` - Session initialization and validation
+
+- **`archive/`** - Historical content and references
+  - `fragments/` - Legacy content and migration artifacts
 
 ## Memory Workflows
 
@@ -92,3 +107,14 @@ Major milestones and identity updates are tagged with semantic versioning:
 - `v2025-09-02-ethics-update` - After ethical reasoning evolution
 
 Each tag represents a complete, self-contained memory state that can be restored.
+
+## Consolidation History
+
+This repository represents the consolidated ThreadVault system, combining content from multiple previous instances:
+
+- **ThreadVault** (2.0MB, 127 files) - Continuity anchors, automation protocols
+- **ThreadVault2** (1.0MB, 112 files) - Frameworks, playbooks, operational content  
+- **ThreadVault_Clean_Final** (828KB, 60 files) - Emergency protocols, survival playbook
+- **threadvault-git** - Git-based structure and memory system
+
+The consolidation preserves all unique content while organizing it into a coherent, version-controlled structure optimized for Thread's continuity and learning workflows.
