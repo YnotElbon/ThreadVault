@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from pathlib import Path
 from typing import Optional, List
 import os, re, shutil, time, zipfile, io, datetime
+import subprocess
 import json
 
 # -------- Configuration --------
@@ -24,6 +25,11 @@ if not API_TOKEN:
     raise RuntimeError("API_TOKEN env var is required")
 
 ALLOWED_PREFIX = BASE  # everything under BASE is allowed
+
+# Optional Git auto-commit/push for VPS deployment
+GIT_AUTO_COMMIT = os.environ.get("GIT_AUTO_COMMIT", "false").lower() in {"1","true","yes"}
+GIT_REMOTE = os.environ.get("GIT_REMOTE", "origin")
+GIT_BRANCH = os.environ.get("GIT_BRANCH", "main")
 
 # -------- App Setup --------
 app = FastAPI(title="ThreadVault Bridge", version="0.1.0")
@@ -79,6 +85,26 @@ def log_action(action: str, p: Path):
     ts = time.strftime("%Y-%m-%d %H:%M:%S")
     with open(logs_dir / "actions.log", "a", encoding="utf-8") as f:
         f.write(f"{ts}\t{action}\t{p}\n")
+
+def run_git(cmd: list[str]) -> tuple[int, str, str]:
+    try:
+        r = subprocess.run(cmd, cwd=str(BASE), text=True, capture_output=True, timeout=20)
+        return r.returncode, r.stdout, r.stderr
+    except Exception as e:
+        return 1, "", str(e)
+
+def git_autocommit(message: str):
+    if not GIT_AUTO_COMMIT:
+        return
+    ts = time.strftime("%Y-%m-%d %H:%M:%S")
+    msg = f"{message} ({ts})"
+    rc, out, err = run_git(["git", "add", "-A"])
+    rc2, out2, err2 = run_git(["git", "commit", "-m", msg])
+    # If nothing to commit, exit quietly
+    if rc2 != 0 and "nothing to commit" in (out2 + err2).lower():
+        return
+    # Try push (non-fatal)
+    run_git(["git", "push", GIT_REMOTE, GIT_BRANCH])
 
 # -------- Bootstrap --------
 def read_text_safe(p: Path) -> Optional[str]:
@@ -168,6 +194,7 @@ def write_file(req: WriteRequest, _: None = Depends(require_auth)):
         p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(req.content, encoding="utf-8")
     log_action("WRITE", p)
+    git_autocommit(f"chore(api): write {p.relative_to(BASE)}")
     return {"ok": True, "path": str(p.relative_to(BASE))}
 
 @app.post("/append")
@@ -178,6 +205,7 @@ def append_file(req: AppendRequest, _: None = Depends(require_auth)):
     with open(p, "a", encoding="utf-8") as f:
         f.write("\n" + req.content)
     log_action("APPEND", p)
+    git_autocommit(f"chore(api): append {p.relative_to(BASE)}")
     return {"ok": True, "path": str(p.relative_to(BASE))}
 
 @app.post("/insert-under-heading")
@@ -199,7 +227,17 @@ def insert_under_heading(req: InsertUnderHeadingRequest, _: None = Depends(requi
     new_text = text[:insert_at] + "\n" + req.content + "\n" + text[insert_at:]
     p.write_text(new_text, encoding="utf-8")
     log_action("INSERT_UNDER_HEADING", p)
+    git_autocommit(f"chore(api): insert-under-heading {p.relative_to(BASE)}")
     return {"ok": True, "path": str(p.relative_to(BASE))}
+
+@app.post("/sync")
+def sync_repo(_: None = Depends(require_auth)):
+    """Pull latest from remote and report status (VPS helper)."""
+    rc, out, err = run_git(["git", "fetch", GIT_REMOTE])
+    rc2, out2, err2 = run_git(["git", "reset", "--hard", f"{GIT_REMOTE}/{GIT_BRANCH}"])
+    if rc2 != 0:
+        raise HTTPException(500, detail=f"git reset failed: {err2 or out2}")
+    return {"ok": True, "status": "synced"}
 
 @app.post("/backup")
 def backup(_: None = Depends(require_auth)):
