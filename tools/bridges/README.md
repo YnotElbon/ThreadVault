@@ -23,6 +23,21 @@ Give a GPT Action **safe edit permissions** to a *restricted* portion of your Ob
 - `POST /insert-under-heading` – add content under a specific heading
 - `POST /backup` – zip the entire ThreadVault into `Backups/`
 
+## Universal CLI (tv)
+
+For any local agent or script, use `system/bin/tv` as a thin wrapper over the bridge:
+
+- `tv health`
+- `tv list [SUBDIR]`
+- `tv read PATH`
+- `tv write PATH FILE|-`
+- `tv append PATH FILE|-`
+- `tv insert PATH HEADING FILE|-`
+- `tv backup`
+
+Config: `system/config.bridge.json` with `url` and `token_file`.
+Add to PATH (optional): `ln -sf "$PWD/system/bin/tv" /usr/local/bin/tv`.
+
 ## Connect as a GPT Action
 
 - Host `openapi.yaml` at `https://YOUR_PUBLIC_HOSTNAME/openapi.yaml` (same server or static hosting).
@@ -35,4 +50,3 @@ Give a GPT Action **safe edit permissions** to a *restricted* portion of your Ob
 - Only files under `THREADVAULT_BASE` are touched.
 - All writes are logged at `ThreadVault/_bridge_logs/actions.log`.
 - PDFs are ignored on write; this is a markdown-first bridge.
-

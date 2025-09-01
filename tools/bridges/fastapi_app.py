@@ -125,6 +125,13 @@ def serve_openapi_yaml():
         raise HTTPException(404, detail="openapi.yaml not found")
     return p.read_text(encoding="utf-8")
 
+@app.get("/public-url", response_class=PlainTextResponse)
+def public_url():
+    p = BASE / "system/public_url.txt"
+    if not p.exists():
+        raise HTTPException(404, detail="No public URL available")
+    return p.read_text(encoding="utf-8").strip()
+
 # -------- Endpoints --------
 @app.get("/health", response_class=PlainTextResponse)
 def health():

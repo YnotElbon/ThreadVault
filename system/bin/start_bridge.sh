@@ -25,12 +25,12 @@ pip install --disable-pip-version-check fastapi uvicorn >/dev/null 2>&1
 export THREADVAULT_BASE="$ROOT_DIR"
 export API_TOKEN="$API_TOKEN"
 
-# Default port
-PORT="8787"
+# Host/Port (override via env)
+HOST="${HOST:-127.0.0.1}"
+PORT="${PORT:-8787}"
 LOG_DIR="system"
 mkdir -p "$LOG_DIR"
 
 exec uvicorn tools.bridges.fastapi_app:app \
-  --host 127.0.0.1 \
+  --host "$HOST" \
   --port "$PORT"
-
