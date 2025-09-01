@@ -29,6 +29,16 @@ print(str(zip_path))
 PY
 "$ZIP_PATH"
 
+# Reminder: security follow-up after one week (2025-09-08)
+TODAY="$(date '+%Y-%m-%d')"
+DUE="2025-09-08"
+if [[ "$TODAY" > "$DUE" || "$TODAY" == "$DUE" ]]; then
+  echo "[REMINDER] Security follow-up due: rotate bridge token, ensure secrets untracked, consider history purge." | tee -a system/maintenance_launchd.out.log || true
+  # Drop a marker file once (idempotent)
+  mkdir -p system/reminders
+  echo "$TODAY" > system/reminders/security_followup_due
+fi
+
 # Prune old backups (retain 30 days)
 find "$BACKUPS_DIR" -type f -name "*_ThreadVault.zip" -mtime +30 -print -delete || true
 
