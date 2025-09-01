@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from pathlib import Path
 from typing import Optional, List
 import os, re, shutil, time, zipfile, io, datetime
+import json
 
 # -------- Configuration --------
 # REQUIRED: set environment variables before running:
@@ -78,6 +79,51 @@ def log_action(action: str, p: Path):
     ts = time.strftime("%Y-%m-%d %H:%M:%S")
     with open(logs_dir / "actions.log", "a", encoding="utf-8") as f:
         f.write(f"{ts}\t{action}\t{p}\n")
+
+# -------- Bootstrap --------
+def read_text_safe(p: Path) -> Optional[str]:
+    try:
+        return p.read_text(encoding="utf-8")
+    except Exception:
+        return None
+
+@app.get("/bootstrap")
+def bootstrap(_: None = Depends(require_auth)):
+    """Return core identity + memory bundle for quick session initialization."""
+    kernel = read_text_safe(BASE / "identity/kernel.md")
+    ethics = read_text_safe(BASE / "identity/ethics.md")
+    semantic = read_text_safe(BASE / "memory/semantic.md")
+    today = datetime.datetime.now().strftime('%Y-%m-%d')
+    episodic = read_text_safe(BASE / f"memory/episodic/{today}.md")
+    facts = None
+    facts_path = BASE / "knowledge/facts.json"
+    if facts_path.exists():
+        try:
+            facts = json.loads(facts_path.read_text(encoding="utf-8"))
+        except Exception:
+            facts = None
+    data = {
+        "identity": {
+            "kernel_md": kernel,
+            "ethics_md": ethics,
+        },
+        "memory": {
+            "semantic_md": semantic,
+            "episodic_today_md": episodic,
+        },
+        "knowledge": {
+            "facts_json": facts
+        }
+    }
+    return JSONResponse(content=data)
+
+@app.get("/openapi.yaml", response_class=PlainTextResponse)
+def serve_openapi_yaml():
+    """Serve the static OpenAPI file from the repo for GPT Actions import."""
+    p = Path(__file__).parent / "openapi.yaml"
+    if not p.exists():
+        raise HTTPException(404, detail="openapi.yaml not found")
+    return p.read_text(encoding="utf-8")
 
 # -------- Endpoints --------
 @app.get("/health", response_class=PlainTextResponse)
