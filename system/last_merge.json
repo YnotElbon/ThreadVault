@@ -1,8 +1,8 @@
 {
   "last_merge": {
-    "timestamp": "2025-08-31T04:43:43.620636",
-    "commit_hash": "55aa9203c3975311223a72d5a09443b8e6d4cf20",
-    "subject": "feat(knowledge): Document Git workflow mastery skill",
+    "timestamp": "2025-09-01T03:01:23.446832",
+    "commit_hash": "2827ee861e774d81c6f335f60a81a7c4ffc72765",
+    "subject": "feat(github): Configure GitHub as primary ThreadVault",
     "validation_status": "passed"
   },
   "integrity_checks": {
