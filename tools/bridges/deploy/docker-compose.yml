@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  threadvault-bridge:
+    build:
+      context: ../../..
+      dockerfile: tools/bridges/deploy/Dockerfile
+    image: threadvault/bridge:latest
+    container_name: threadvault-bridge
+    restart: unless-stopped
+    environment:
+      - API_TOKEN=${API_TOKEN}
+      - THREADVAULT_BASE=/vault
+      - HOST=0.0.0.0
+      - PORT=8787
+      - GIT_AUTO_COMMIT=true
+      - GIT_REMOTE=origin
+      - GIT_BRANCH=main
+    volumes:
+      - ./data:/vault
+    ports:
+      - "8787:8787"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8787/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+

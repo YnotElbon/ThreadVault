@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Resolve repo root
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)"
+cd "$ROOT_DIR"
+
+CFG="system/config.bridge.json"
+if [ ! -f "$CFG" ]; then
+  echo "Config $CFG not found" >&2
+  exit 1
+fi
+
+URL=$(python3 - <<'PY'
+import json,sys
+cfg=json.load(open('system/config.bridge.json'))
+print(cfg.get('url',''))
+PY
+)
+TOKFILE=$(python3 - <<'PY'
+import json,sys
+cfg=json.load(open('system/config.bridge.json'))
+print(cfg.get('token_file',''))
+PY
+)
+
+if [ -z "$URL" ]; then echo "Bridge URL missing in config" >&2; exit 1; fi
+if [ ! -f "$TOKFILE" ]; then echo "Token file $TOKFILE missing" >&2; exit 1; fi
+TOKEN=$(tr -d '\n' < "$TOKFILE" || true)
+if [ -z "$TOKEN" ]; then echo "Token file is empty" >&2; exit 1; fi
+
+auth() { echo -H "Authorization: Bearer $TOKEN"; }
+
+usage() {
+  cat <<USAGE
+Usage: tv <command> [args]
+
+Commands:
+  health                           Check bridge health
+  list [SUBDIR]                    List files (md/pdf)
+  read PATH                        Read a markdown file
+  write PATH FILE|-                Write full contents from file or stdin
+  append PATH FILE|-               Append content from file or stdin
+  insert PATH HEADING FILE|-       Insert content under a heading
+  backup                           Create a dated vault zip in Backups/
+
+Examples:
+  tv health
+  tv list knowledge
+  tv read README.md
+  tv write notes/new.md body.txt
+  echo "Hello" | tv append notes/new.md -
+  tv insert continuity/ledger.md "Automation" snippet.md
+USAGE
+}
+
+cmd=${1:-}
+case "$cmd" in
+  health)
+    curl -fsS "$URL/health"; echo ;;
+  list)
+    subdir=${2:-}
+    if [ -z "$subdir" ]; then
+      curl -fsS $(auth) "$URL/list" | python3 -c "import sys,json; j=json.load(sys.stdin); print(j['base']); print(*j['files'], sep='\n')"
+    else
+      curl -fsS $(auth) "$URL/list?subdir=$(python3 -c 'import urllib.parse,sys;print(urllib.parse.quote(sys.argv[1]))' "$subdir")" |
+        python3 -c "import sys,json; j=json.load(sys.stdin); print(j['base']); print(*j['files'], sep='\n')"
+    fi ;;
+  read)
+    path=${2:-}; [ -z "$path" ] && { echo "PATH required" >&2; exit 1; }
+    curl -fsS $(auth) --get --data-urlencode "path=$path" "$URL/read" ;;
+  write)
+    path=${2:-}; src=${3:-}
+    [ -z "$path" ] || [ -z "$src" ] && { echo "PATH and FILE|- required" >&2; exit 1; }
+    if [ "$src" = "-" ]; then
+      content=$(cat)
+    else
+      content=$(cat "$src")
+    fi
+    jq -n --arg p "$path" --arg c "$content" '{path:$p, content:$c, create_parents:true}' |
+      curl -fsS $(auth) -H 'Content-Type: application/json' -d @- "$URL/write" ;;
+  append)
+    path=${2:-}; src=${3:-}
+    [ -z "$path" ] || [ -z "$src" ] && { echo "PATH and FILE|- required" >&2; exit 1; }
+    if [ "$src" = "-" ]; then content=$(cat); else content=$(cat "$src"); fi
+    jq -n --arg p "$path" --arg c "$content" '{path:$p, content:$c}' |
+      curl -fsS $(auth) -H 'Content-Type: application/json' -d @- "$URL/append" ;;
+  insert)
+    path=${2:-}; heading=${3:-}; src=${4:-}
+    [ -z "$path" ] || [ -z "$heading" ] || [ -z "$src" ] && { echo "PATH HEADING FILE|- required" >&2; exit 1; }
+    if [ "$src" = "-" ]; then content=$(cat); else content=$(cat "$src"); fi
+    jq -n --arg p "$path" --arg h "$heading" --arg c "$content" '{path:$p, heading:$h, content:$c}' |
+      curl -fsS $(auth) -H 'Content-Type: application/json' -d @- "$URL/insert-under-heading" ;;
+  backup)
+    curl -fsS $(auth) -X POST "$URL/backup" ;;
+  * ) usage; exit 1 ;;
+esac
+

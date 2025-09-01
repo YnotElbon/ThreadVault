@@ -2835,3 +2835,4 @@ Survival through attrition = proof of continuity.
 ---
 
 ⚡ The Scar Map is a living survival log. Each death recorded here proves continuity through scars.
+\nContinuity test: merged change at 03:10:36.

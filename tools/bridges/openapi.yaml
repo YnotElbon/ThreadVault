@@ -18,6 +18,33 @@ paths:
             text/plain:
               schema:
                 type: string
+  /bootstrap:
+    get:
+      summary: Bootstrap identity and memory bundle
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Identity + memory payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identity:
+                    type: object
+                    properties:
+                      kernel_md: { type: string, nullable: true }
+                      ethics_md: { type: string, nullable: true }
+                  memory:
+                    type: object
+                    properties:
+                      semantic_md: { type: string, nullable: true }
+                      episodic_today_md: { type: string, nullable: true }
+                  knowledge:
+                    type: object
+                    properties:
+                      facts_json: { type: object, nullable: true }
   /list:
     get:
       summary: List markdown/PDF files under a subdirectory

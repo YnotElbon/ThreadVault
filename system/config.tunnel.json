@@ -1,0 +1,7 @@
+{
+  "method": "cloudflared", 
+  "port": 8787,
+  "hostname": null,
+  "notes": "Uses Cloudflare Quick Tunnel by default (no account required). If you set hostname and a named tunnel, update start_tunnel.sh accordingly."
+}
+
