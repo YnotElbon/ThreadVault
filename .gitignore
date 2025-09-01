@@ -1,23 +1,21 @@
-# System files
+# Python/venv
+.venv/
+__pycache__/
+tools/bridges/__pycache__/
+
+# OS/editor
 .DS_Store
-.vscode/
-.idea/
 
-# Temporary files
-*.tmp
-*.temp
-.cache/
+# Bridge secrets/logs
+system/bridge_token.txt
+system/bridge_token*
+.bridge_token
+.server.log
+system/*.log
+system/*_launchd.*.log
+system/*.pid
+system/_bridge_logs/
 
-# Large binary files (use Git LFS if needed)
-*.pdf
-*.zip
-*.tar.gz
+# Backups
+Backups/
 
-# Sensitive data (should never be committed)
-secrets/
-*.key
-*credentials*
-
-# Work in progress (use feature branches instead)
-wip/
-draft/

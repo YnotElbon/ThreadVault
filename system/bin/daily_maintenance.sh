@@ -29,6 +29,9 @@ print(str(zip_path))
 PY
 "$ZIP_PATH"
 
+# Prune old backups (retain 30 days)
+find "$BACKUPS_DIR" -type f -name "*_ThreadVault.zip" -mtime +30 -print -delete || true
+
 # Commit and push if there are changes
 git add -A || true
 if ! git diff --cached --quiet; then
@@ -37,4 +40,3 @@ if ! git diff --cached --quiet; then
 fi
 
 exit 0
-
