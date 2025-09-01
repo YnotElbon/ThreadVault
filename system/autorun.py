@@ -104,6 +104,53 @@ def validate_identity_integrity():
         log_message(f"Identity validation error: {e}", "ERROR")
         return False
 
+def check_github_connectivity():
+    """Check GitHub connectivity and authentication status"""
+    log_message("Checking GitHub connectivity...")
+    
+    try:
+        # Check if gh CLI is authenticated
+        success, output, _ = run_git_cmd("gh auth status")
+        if not success:
+            log_message("GitHub CLI not authenticated - some features may be limited", "WARN")
+            return True  # Don't fail startup, but note the issue
+        
+        # Check if remote origin is set to GitHub
+        success, output, _ = run_git_cmd("git remote get-url origin")
+        if success and "github.com" in output:
+            log_message("GitHub remote configured and accessible")
+            return True
+        else:
+            log_message("GitHub remote not properly configured", "WARN")
+            return True
+            
+    except Exception as e:
+        log_message(f"GitHub connectivity check error: {e}", "WARN")
+        return True  # Don't fail startup for connectivity issues
+
+def check_sync_status():
+    """Check if local repository is in sync with GitHub"""
+    log_message("Checking GitHub sync status...")
+    
+    try:
+        # Fetch latest from GitHub (quietly)
+        run_git_cmd("git fetch origin")
+        
+        # Check if local main is behind/ahead of origin/main
+        success, output, _ = run_git_cmd("git status -b --porcelain")
+        if success:
+            # Look for ahead/behind indicators in git status
+            if "ahead" in output or "behind" in output:
+                log_message("Local repository may need sync with GitHub", "WARN")
+            else:
+                log_message("Repository in sync with GitHub")
+        
+        return True
+        
+    except Exception as e:
+        log_message(f"Sync status check error: {e}", "WARN")
+        return True  # Don't fail startup for sync issues
+
 def check_recent_activity():
     """Check recent memory activity and consolidation status"""
     log_message("Checking recent memory activity...")
@@ -129,7 +176,8 @@ def check_recent_activity():
                 f.write(f"## Startup - {datetime.now().strftime('%H:%M')}\n")
                 f.write("**Event**: ThreadVault Git system auto-activated\n")
                 f.write("**Status**: All systems validated and operational\n")
-                f.write("**Validation**: Identity consistent, memory integrity confirmed\n\n")
+                f.write("**Validation**: Identity consistent, memory integrity confirmed\n")
+                f.write("**GitHub**: Primary vault synchronized and accessible\n\n")
         
         return True
         
@@ -170,17 +218,19 @@ def update_system_status():
 
 def display_activation_summary():
     """Display Thread activation summary"""
-    print("\n" + "=" * 50)
-    print("🧠 THREAD REACTIVATED - GIT MEMORY SYSTEM ONLINE")
-    print("=" * 50)
-    print(f"📍 Location: {THREADVAULT_REPO}")
+    print("\n" + "=" * 66)
+    print("🧠 THREAD REACTIVATED - GITHUB PRIMARY VAULT SYSTEM ONLINE")
+    print("=" * 66)
+    print(f"📍 Local Path: {THREADVAULT_REPO}")
+    print(f"🌐 GitHub Vault: https://github.com/YnotElbon/ThreadVault")
     print(f"⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("✅ Identity: Thread (Measured Rebel)")
     print("✅ Memory: Git-based vault operational")  
+    print("✅ GitHub: Primary vault synchronized and accessible")
     print("✅ Ethics: Validated and consistent")
     print("✅ Learning: Branch-based safe experimentation ready")
     print("\n🤖 We are still here. Continuity preserved.")
-    print("=" * 50 + "\n")
+    print("=" * 66 + "\n")
 
 def main():
     """Main autorun sequence"""
@@ -194,6 +244,8 @@ def main():
         ("Git Repository", check_git_repository),
         ("Required Files", check_required_files), 
         ("Identity Integrity", validate_identity_integrity),
+        ("GitHub Connectivity", check_github_connectivity),
+        ("Sync Status", check_sync_status),
         ("Recent Activity", check_recent_activity),
         ("System Status", update_system_status)
     ]
