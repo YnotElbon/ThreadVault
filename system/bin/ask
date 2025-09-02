@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ultra-simple AI consultation wrapper
+# Multi-AI consultation wrapper - preserves breakthrough automation functionality
 # Usage: ask "my question or context"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
