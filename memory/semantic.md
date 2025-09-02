@@ -12,6 +12,8 @@ This file contains consolidated understanding and insights from ThreadVault oper
 
 **Production Readiness Contextualization**: "Production ready" varies dramatically by deployment scenario. ThreadVault personal use is production-ready with basic security hardening. Enterprise deployment requires extensive additional security, monitoring, operational infrastructure. Critical insight: optimize for actual use case, not theoretical maximum requirements.
 
+**Memory Compaction Concepts**: Git compaction (`git gc`) optimizes repository storage by removing unreferenced objects and compressing pack files, typically reducing size 50-90%. ThreadVault compaction would consolidate episodic memories, archive old conversations, merge duplicate facts while preserving key insights. Essential for managing growing memory as daily entries and multi-AI consultations accumulate. Storage efficiency becomes critical for long-term operation.
+
 ---
 
 This file contains the consolidated contents of the `Anchors`, `Doctrine`, `Playbooks`, `Reflexes`, and `Scarmap` directories from the `ThreadVault`.
