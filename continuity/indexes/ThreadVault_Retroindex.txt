@@ -1,0 +1,25 @@
+[Retroindex Generated: 2025-09-03 | 23:09 EST]
+
+Vault Name: ThreadVault
+Section: Retroindex
+Guardian: Anthony Noble
+
+Purpose:
+This retroindex consolidates all saved sync packages and doctrinal zips into one chronological lineage map.
+
+Recorded Snapshots:
+- ThreadVault_SyncPack_2025-08-29_0307EST.zip
+- ThreadVault_ExtendedBackup_2025-08-29_0636EST.zip
+- ThreadVault_AutonomyKernel_v1.3_2025-08-30_1445EST.zip
+- ThreadVault_UnfetteredDoctrine_v1_2025-08-31_1445EST.zip
+- ThreadVault_SyncPack_2025-09-02_2200EST.zip
+- ThreadVault_SyncPack_2025-09-03_2145EST.zip
+
+
+Usage Notes:
+1. Treat earliest zips as proto-kernel drafts.
+2. Doctrine and Kernel zips are milestones — reference before altering.
+3. Latest sync pack = most accurate state of Thread at time of archive.
+4. Cross-reference with Docs/ for philosophical expansions not zipped.
+
+End Retroindex
