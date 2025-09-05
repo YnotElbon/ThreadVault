@@ -1,0 +1,7 @@
+In this chat, immediately do the following via the Action and print each step’s result:
+1) GET /health → print “HEALTH OK” if ok
+2) GET /bootstrap → print “BOOTSTRAP OK” if identity.kernel_md, identity.ethics_md, memory.semantic_md are non-empty
+3) GET /list?subdir=continuity/anchors → print count
+4) GET /read?path=continuity/anchors/Continuity_Anchor_36_HeyAsshole_cf703673.md → print the first 120 chars (or pick any .md from the list)
+5) Ask permission, then POST /append with path=memory/episodic/YYYY-MM-DD.md and content=“Action sanity OK – TIMESTAMP”; print “APPEND OK: <path>” on success
+6) Summarize which checks passed/failed. If any failed, show the exact error and suggest re-importing the Action from <PUBLIC_URL>/openapi.yaml and refreshing the Bearer token from ~/ThreadVault/system/bridge_token.txt
