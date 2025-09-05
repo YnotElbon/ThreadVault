@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Probes configured providers and logs a pass/fail snapshot to episodic memory.
+# Usage: system/bin/consult-selftest
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)"
+cd "$ROOT_DIR"
+
+declare -A providers
+declare -A models
+
+providers[anthropic]="${ANTHROPIC_API_KEY:-}"
+providers[openai]="${OPENAI_API_KEY:-}"
+providers[mistral]="${MISTRAL_API_KEY:-}"
+providers[gemini]="${GOOGLE_API_KEY:-}"
+
+models[anthropic]="${ANTHROPIC_MODEL:-claude-3-5-sonnet-20240620}"
+models[openai]="${OPENAI_MODEL:-gpt-4o-mini}"
+models[mistral]="${MISTRAL_MODEL:-mistral-small-latest}"
+models[gemini]="${GEMINI_MODEL:-gemini-1.5-flash-latest}"
+models[ollama]="${OLLAMA_MODEL:-llama3:latest}"
+
+summary=()
+
+run_test() {
+  local p="$1"; shift
+  local m="$1"; shift
+  local ok=0
+  local out
+  if out=$(./system/bin/consult -p "$p" -m "$m" "Self-test: $p" 2>/dev/null | head -n 1); then
+    if [ -n "$out" ]; then ok=1; fi
+  fi
+  if [ $ok -eq 1 ]; then summary+=("$p: PASS ($m)"); else summary+=("$p: FAIL ($m)"); fi
+}
+
+# Cloud providers if keys are set
+for p in anthropic openai mistral gemini; do
+  if [ -n "${providers[$p]}" ]; then
+    run_test "$p" "${models[$p]}"
+  else
+    summary+=("$p: SKIP (no key)")
+  fi
+done
+
+# Ollama if reachable
+if curl -sS --max-time 1 http://127.0.0.1:11434/api/tags >/dev/null; then
+  run_test ollama "${models[ollama]}"
+else
+  summary+=("ollama: SKIP (not running)")
+fi
+
+# Log to episodic
+today="$(date '+%Y-%m-%d')"; time_str="$(date '+%H:%M')"
+epi="memory/episodic/${today}.md"
+mkdir -p "$(dirname "$epi")"
+[ -f "$epi" ] || { echo "# Episodic Memory - $today" > "$epi"; echo >> "$epi"; }
+{
+  echo "### Consult Self-Test - $time_str"
+  printf -- "- %s\n" "${summary[@]}"
+  echo
+  echo "---"
+  echo
+} >> "$epi"
+
+# Print summary
+printf "%s\n" "${summary[@]}"
+
+exit 0
+

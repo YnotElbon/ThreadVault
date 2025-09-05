@@ -28,6 +28,7 @@ A Git-based memory and continuity system for AI assistants, evolved from the ori
 - **`tools/`** - Utilities and integration tools
   - `scripts/` - Build tools and automation scripts
   - `bridges/` - API connectors and integration utilities
+  - `consult` - Cross-platform consult CLI (see below)
 
 - **`system/`** - System configuration and automation
   - `hooks/` - Git hooks for automated memory management
@@ -118,3 +119,19 @@ This repository represents the consolidated ThreadVault system, combining conten
 - **threadvault-git** - Git-based structure and memory system
 
 The consolidation preserves all unique content while organizing it into a coherent, version-controlled structure optimized for Thread's continuity and learning workflows.
+
+## Consult CLI (Cross-Platform)
+
+- Location: `system/bin/consult` (THE consult tool; `system/bin/ask` forwards here)
+- Providers: Claude (Anthropic), OpenAI, Mistral, Gemini, Ollama (local)
+- Auto-pick order: Claude → OpenAI → Mistral → Gemini → Ollama
+- Env vars:
+  - `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `MISTRAL_API_KEY`, `GOOGLE_API_KEY`
+  - Ollama requires a local daemon at `http://127.0.0.1:11434`
+- Examples:
+  - Claude: `./system/bin/consult -p anthropic "hello"`
+  - OpenAI: `./system/bin/consult -p openai "hello"`
+  - Mistral (API): `export MISTRAL_API_KEY=... && ./system/bin/consult -p mistral "hello"`
+  - Gemini: `./system/bin/consult -p gemini "hello"`
+  - Ollama (local mistral): `ollama serve &; ollama pull mistral; ./system/bin/consult -p ollama -m mistral "hello"`
+- Continuity: Every consult logs Q/A to `memory/episodic/<today>.md`.
