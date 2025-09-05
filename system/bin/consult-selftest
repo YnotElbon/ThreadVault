@@ -19,7 +19,7 @@ models[anthropic]="${ANTHROPIC_MODEL:-claude-3-5-sonnet-20240620}"
 models[openai]="${OPENAI_MODEL:-gpt-4o-mini}"
 models[mistral]="${MISTRAL_MODEL:-mistral-small-latest}"
 models[gemini]="${GEMINI_MODEL:-gemini-1.5-flash-latest}"
-models[ollama]="${OLLAMA_MODEL:-llama3:latest}"
+models[ollama]="${OLLAMA_MODEL:-mistral}"
 
 summary=()
 
@@ -63,8 +63,24 @@ mkdir -p "$(dirname "$epi")"
   echo
 } >> "$epi"
 
-# Print summary
+# Print summary and determine status
 printf "%s\n" "${summary[@]}"
 
-exit 0
+any_fail=0
+for line in "${summary[@]}"; do
+  case "$line" in
+    *FAIL*) any_fail=1;;
+  esac
+done
 
+# On failure: write marker and optionally notify
+if [ $any_fail -eq 1 ]; then
+  mkdir -p system/reminders
+  echo "$time_str" > "system/reminders/consult_selftest_failed_${today}"
+  if [ "${SELFTEST_NOTIFY:-}" = "1" ] && command -v osascript >/dev/null 2>&1; then
+    osascript -e 'display notification "One or more providers failed self-test" with title "Thread Consult Self-Test"'
+  fi
+  exit 1
+fi
+
+exit 0

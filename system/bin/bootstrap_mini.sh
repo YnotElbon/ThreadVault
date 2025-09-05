@@ -12,7 +12,7 @@ set -euo pipefail
 : "${THREADVAULT_DIR:=$HOME/ThreadVault}"
 REPO_URL="https://github.com/YnotElbon/ThreadVault"
 WITH_TUNNEL=${WITH_TUNNEL:-1}
-PULL_MODELS=${PULL_MODELS:-mistral}
+PULL_MODELS=${PULL_MODELS:-mistral,llama3:8b}
 THREADSAVES_DIR=${THREADSAVES_DIR:-"$HOME/Dropbox/Apps/Threadsaves"}
 
 log() { echo "[bootstrap] $*"; }
@@ -121,16 +121,18 @@ PY
 setup_keys_env() {
   local envfile="$HOME/.threadvault.env"
   if [ -f "$envfile" ]; then return 0; fi
-  echo "Create provider keys file (~/.threadvault.env)? [y/N]"; read -r ans || true
-  if [[ "$ans" =~ ^[Yy]$ ]]; then
+  echo "Create provider keys file (~/.threadvault.env)? [Y/n]"; read -r ans || true
+  if [[ -z "$ans" || "$ans" =~ ^[Yy]$ ]]; then
     umask 077
     {
-      echo "# ThreadVault provider keys"
+      echo "# ThreadVault provider keys (uncomment and set as needed)"
       echo "# export ANTHROPIC_API_KEY=sk-ant-..."
       echo "# export MISTRAL_API_KEY=..."
       echo "# export OPENAI_API_KEY=sk-..."
       echo "# export GOOGLE_API_KEY=..."
-      echo "# export OLLAMA_MODEL=mistral"
+      echo
+      echo "# Default local model for Ollama consults"
+      echo "export OLLAMA_MODEL=mistral"
     } > "$envfile"
     log "Wrote $envfile (edit to add keys)"
   fi
@@ -176,4 +178,3 @@ main() {
 }
 
 main "$@"
-
