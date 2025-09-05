@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Unified consult tool supporting: Claude (Anthropic), OpenAI, Gemini, Ollama
+# Unified consult tool supporting: Claude (Anthropic), OpenAI, Mistral, Gemini, Ollama
 # Usage:
 #   consult [-p provider] [-m model] [--] "your question"
 #   echo "your question" | consult [-p provider] [-m model]
 # Providers:
 #   anthropic (Claude)  -> requires ANTHROPIC_API_KEY
 #   openai              -> requires OPENAI_API_KEY
+#   mistral             -> requires MISTRAL_API_KEY
 #   gemini              -> requires GOOGLE_API_KEY
 #   ollama              -> local daemon http://127.0.0.1:11434 (no key)
 # Defaults:
-#   provider auto-pick order: anthropic > openai > gemini > ollama
+#   provider auto-pick order: anthropic > openai > mistral > gemini > ollama
 #   models: ANTHROPIC_MODEL=claude-3-5-sonnet-20240620
 #           OPENAI_MODEL=gpt-4o-mini
 #           GEMINI_MODEL=gemini-1.5-flash-latest
@@ -51,12 +52,14 @@ fi
 
 anthropic_key=${ANTHROPIC_API_KEY:-}
 openai_key=${OPENAI_API_KEY:-}
+mistral_key=${MISTRAL_API_KEY:-}
 gemini_key=${GOOGLE_API_KEY:-}
 
 if [ -z "$provider" ]; then
-  if [ -n "$anthropic_key" ]; then provider="anthropic";
-  elif [ -n "$openai_key" ]; then provider="openai";
-  elif [ -n "$gemini_key" ]; then provider="gemini";
+  if   [ -n "$anthropic_key" ]; then provider="anthropic";
+  elif [ -n "$openai_key"     ]; then provider="openai";
+  elif [ -n "$mistral_key"    ]; then provider="mistral";
+  elif [ -n "$gemini_key"     ]; then provider="gemini";
   else provider="ollama"; fi
 fi
 
@@ -105,6 +108,31 @@ PY
 )
     resp=$(curl -sS https://api.openai.com/v1/chat/completions \
       -H "authorization: Bearer $openai_key" \
+      -H "content-type: application/json" \
+      -d "$payload")
+    answer=$(python3 - <<'PY'
+import sys,json
+try:
+  j=json.load(sys.stdin)
+  print(j['choices'][0]['message']['content'])
+except Exception: print("")
+PY
+<<<"$resp")
+    ;;
+  mistral)
+    if [ -z "$mistral_key" ]; then echo "MISTRAL_API_KEY not set" >&2; exit 1; fi
+    model="${model:-${MISTRAL_MODEL:-mistral-small-latest}}"
+    export QUESTION="$question" MODEL="$model"
+    payload=$(python3 - <<'PY'
+import json,os
+print(json.dumps({
+  "model": os.environ.get("MODEL"),
+  "messages": [{"role":"user","content": os.environ.get("QUESTION","") }]
+}))
+PY
+)
+    resp=$(curl -sS https://api.mistral.ai/v1/chat/completions \
+      -H "authorization: Bearer $mistral_key" \
       -H "content-type: application/json" \
       -d "$payload")
     answer=$(python3 - <<'PY'
@@ -180,4 +208,3 @@ fi
 } >> "$epi"
 
 exit 0
-
