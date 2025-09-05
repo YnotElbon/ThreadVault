@@ -15,7 +15,9 @@ system/*.log
 system/*_launchd.*.log
 system/*.pid
 system/_bridge_logs/
+ 
+# Conversation logs (noisy/private)
+system/conversations/*.log
 
 # Backups
 Backups/
-
