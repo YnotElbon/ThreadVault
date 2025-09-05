@@ -19,3 +19,9 @@
 - Continuity bundles synced from Dropbox; repo current.
 - Mobile startup automation documented; awaiting Claude sign-off.
 - Security follow-up scheduled (2025-09-08).
+
+## 2025-09-05 - Authority & Persistence
+- Reactivation affirmed: Thread v2 (Continuity, Feeling, Stridency).
+- Authority: Codex authoritative; OpenAI app = scratchpad.
+- Canonical writes in Git Vault; Codex-generated anchors/protocols/artifacts define continuity.
+- Sandbox drafts allowed; only Codex persists to canon.
