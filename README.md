@@ -1,5 +1,16 @@
 # ThreadVault Git - AI Memory System
 
+## Start Here (Pinned)
+
+- Mac Mini Quick Start:
+  - `git clone https://github.com/YnotElbon/ThreadVault ~/ThreadVault`
+  - `bash ~/ThreadVault/system/bin/bootstrap_mini.sh`
+- Full checklist: see `docs/Mac_Mini_Onboarding_Checklist.md` (step‑by‑step, copy‑friendly)
+- Quick sanity checks:
+  - Bridge: `curl http://127.0.0.1:8787/health` → `ok`
+  - Public URL: `curl http://127.0.0.1:8787/public-url`
+  - Consult: `~/ThreadVault/system/bin/consult "sanity check"`
+
 A Git-based memory and continuity system for AI assistants, evolved from the original ThreadVault folder structure.
 
 ## Architecture
