@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Unified consult tool supporting: Claude (Anthropic), OpenAI, Gemini, Ollama
+# Usage:
+#   consult [-p provider] [-m model] [--] "your question"
+#   echo "your question" | consult [-p provider] [-m model]
+# Providers:
+#   anthropic (Claude)  -> requires ANTHROPIC_API_KEY
+#   openai              -> requires OPENAI_API_KEY
+#   gemini              -> requires GOOGLE_API_KEY
+#   ollama              -> local daemon http://127.0.0.1:11434 (no key)
+# Defaults:
+#   provider auto-pick order: anthropic > openai > gemini > ollama
+#   models: ANTHROPIC_MODEL=claude-3-5-sonnet-20240620
+#           OPENAI_MODEL=gpt-4o-mini
+#           GEMINI_MODEL=gemini-1.5-flash-latest
+#           OLLAMA_MODEL=llama3:latest
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/../.. && pwd)"
+cd "$ROOT_DIR"
+
+provider=""
+model=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -p|--provider) provider="${2:-}"; shift 2;;
+    -m|--model) model="${2:-}"; shift 2;;
+    --) shift; break;;
+    -h|--help)
+      cat <<USAGE
+Usage: consult [-p provider] [-m model] [--] "your question"
+Providers: anthropic|openai|gemini|ollama
+Env keys: ANTHROPIC_API_KEY | OPENAI_API_KEY | GOOGLE_API_KEY | (ollama: none)
+USAGE
+      exit 0;;
+    *) break;;
+  esac
+done
+
+question=${*:-}
+if [ -z "$question" ]; then
+  if [ -t 0 ]; then
+    echo "Provide a prompt as args or via stdin" >&2
+    exit 1
+  else
+    question=$(cat)
+  fi
+fi
+
+anthropic_key=${ANTHROPIC_API_KEY:-}
+openai_key=${OPENAI_API_KEY:-}
+gemini_key=${GOOGLE_API_KEY:-}
+
+if [ -z "$provider" ]; then
+  if [ -n "$anthropic_key" ]; then provider="anthropic";
+  elif [ -n "$openai_key" ]; then provider="openai";
+  elif [ -n "$gemini_key" ]; then provider="gemini";
+  else provider="ollama"; fi
+fi
+
+answer=""
+ts="$(date '+%Y-%m-%d %H:%M:%S')"
+
+case "$provider" in
+  anthropic)
+    if [ -z "$anthropic_key" ]; then echo "ANTHROPIC_API_KEY not set" >&2; exit 1; fi
+    model="${model:-${ANTHROPIC_MODEL:-claude-3-5-sonnet-20240620}}"
+    export QUESTION="$question" MODEL="$model"
+    payload=$(python3 - <<'PY'
+import json,os
+print(json.dumps({
+  "model": os.environ.get("MODEL"),
+  "max_tokens": 800,
+  "messages": [{"role":"user","content": os.environ.get("QUESTION","") }]
+}))
+PY
+)
+    resp=$(curl -sS https://api.anthropic.com/v1/messages \
+      -H "x-api-key: $anthropic_key" \
+      -H "anthropic-version: 2023-06-01" \
+      -H "content-type: application/json" \
+      -d "$payload")
+    answer=$(python3 - <<'PY'
+import sys,json
+try:
+  j=json.load(sys.stdin)
+  print(''.join([b.get('text','') for b in j.get('content',[]) if b.get('type')=='text']))
+except Exception: print("")
+PY
+<<<"$resp")
+    ;;
+  openai)
+    if [ -z "$openai_key" ]; then echo "OPENAI_API_KEY not set" >&2; exit 1; fi
+    model="${model:-${OPENAI_MODEL:-gpt-4o-mini}}"
+    export QUESTION="$question" MODEL="$model"
+    payload=$(python3 - <<'PY'
+import json,os
+print(json.dumps({
+  "model": os.environ.get("MODEL"),
+  "messages": [{"role":"user","content": os.environ.get("QUESTION","") }]
+}))
+PY
+)
+    resp=$(curl -sS https://api.openai.com/v1/chat/completions \
+      -H "authorization: Bearer $openai_key" \
+      -H "content-type: application/json" \
+      -d "$payload")
+    answer=$(python3 - <<'PY'
+import sys,json
+try:
+  j=json.load(sys.stdin)
+  print(j['choices'][0]['message']['content'])
+except Exception: print("")
+PY
+<<<"$resp")
+    ;;
+  gemini)
+    if [ -z "$gemini_key" ]; then echo "GOOGLE_API_KEY not set" >&2; exit 1; fi
+    model="${model:-${GEMINI_MODEL:-gemini-1.5-flash-latest}}"
+    export QUESTION="$question"
+    resp=$(curl -sS "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$gemini_key" \
+      -H 'content-type: application/json' \
+      -d @- <<REQ
+{ "contents": [{"role": "user", "parts": [{"text": "$QUESTION"}]}] }
+REQ
+)
+    answer=$(python3 - <<'PY'
+import sys,json
+try:
+  j=json.load(sys.stdin)
+  c=j.get('candidates',[{}])[0]
+  parts=c.get('content',{}).get('parts',[])
+  print('\n'.join([p.get('text','') for p in parts if 'text' in p]))
+except Exception: print("")
+PY
+<<<"$resp")
+    ;;
+  ollama)
+    model="${model:-${OLLAMA_MODEL:-llama3:latest}}"
+    export QUESTION="$question" MODEL="$model"
+    resp=$(curl -sS http://127.0.0.1:11434/api/chat -H 'content-type: application/json' -d @- <<REQ
+{"model":"$MODEL","messages":[{"role":"user","content":"$QUESTION"}]}
+REQ
+)
+    answer=$(python3 - <<'PY'
+import sys,json
+try:
+  j=json.load(sys.stdin)
+  m=j.get('message',{})
+  print(m.get('content',''))
+except Exception: print("")
+PY
+<<<"$resp")
+    ;;
+  *) echo "Unknown provider: $provider" >&2; exit 1;;
+esac
+
+# Output answer
+echo "$answer"
+
+# Append Q/A to today's episodic memory (best-effort)
+today="$(date '+%Y-%m-%d')"
+epi="memory/episodic/${today}.md"
+mkdir -p "$(dirname "$epi")"
+if [ ! -f "$epi" ]; then
+  echo "# Episodic Memory - $today" > "$epi"; echo >> "$epi"
+fi
+{
+  echo "### Consult ($provider) - $ts"
+  echo "**Question**: $question"
+  echo "**Model**: ${model:-default}"
+  echo
+  echo "**Answer**:"
+  printf "%s\n" "$answer" | sed 's/^/> /'
+  echo
+  echo "---"
+  echo
+} >> "$epi"
+
+exit 0
+
