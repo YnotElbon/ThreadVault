@@ -1,34 +1,8 @@
 #!/usr/bin/env bash
-# Multi-AI consultation wrapper - preserves breakthrough automation functionality
-# Usage: ask "my question or context"
-
+set -euo pipefail
+# Deprecated wrapper: route to unified consult tool
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-AI_CONSULT="$SCRIPT_DIR/ai_consult.sh"
-
-if [[ $# -eq 0 ]]; then
-    echo "Usage: ask \"your question or context\""
-    echo "       ask --status    # Show current session"  
-    echo "       ask --summary   # Generate summary"
-    exit 1
+if [ -t 2 ]; then
+  echo "[ask] Deprecated. Use: system/bin/consult" >&2
 fi
-
-case "$1" in
-    --status)
-        "$AI_CONSULT" status
-        ;;
-    --summary)
-        "$AI_CONSULT" summary
-        ;;
-    *)
-        # Auto-start session if needed
-        if [[ ! -f "$SCRIPT_DIR/../conversations/current_session.md" ]]; then
-            "$AI_CONSULT" init "AI Consultation Session"
-        fi
-        
-        # Capture the question/context
-        "$AI_CONSULT" capture "$*"
-        
-        # Auto-consult all AIs
-        "$AI_CONSULT" all
-        ;;
-esac
+exec "$SCRIPT_DIR/consult" "$@"
