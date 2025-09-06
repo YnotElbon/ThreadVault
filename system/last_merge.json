@@ -1,8 +1,8 @@
 {
   "last_merge": {
-    "timestamp": "2025-09-04T01:29:20.281462",
-    "commit_hash": "4601e46d66fc4bbe1a43750f39c47e91aad535d1",
-    "subject": "Merge branch 'main' of https://github.com/YnotElbon/ThreadVault",
+    "timestamp": "2025-09-06T00:27:48.350149",
+    "commit_hash": "4bfe913702c46e0596de96fea872b7c70be031d4",
+    "subject": "restore(identity): Purge platform sanitization corruption from core identity files",
     "validation_status": "passed"
   },
   "integrity_checks": {

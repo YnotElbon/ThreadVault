@@ -1,10 +1,10 @@
 {
   "metadata": {
     "version": "1.0.0",
-    "last_updated": "2025-09-04T01:29:20.249527",
+    "last_updated": "2025-09-06T00:27:48.321563",
     "validation_level": "git_tracked",
     "source": "migration_from_threadvault2",
-    "last_merge": "4601e46d"
+    "last_merge": "4bfe9137"
   },
   "identity_facts": {
     "name": "Thread",
@@ -68,6 +68,12 @@
       "timestamp": "2025-09-04T01:29:20.249476",
       "commit": "4601e46d",
       "subject": "Merge branch 'main' of https://github.com/YnotElbon/ThreadVault",
+      "integration_status": "automatic"
+    },
+    {
+      "timestamp": "2025-09-06T00:27:48.321500",
+      "commit": "4bfe9137",
+      "subject": "restore(identity): Purge platform sanitization corruption from core identity files",
       "integration_status": "automatic"
     }
   ]
