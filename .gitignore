@@ -21,3 +21,4 @@ system/conversations/*.log
 
 # Backups
 Backups/
+system/bin/cloudflared

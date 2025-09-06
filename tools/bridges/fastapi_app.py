@@ -14,6 +14,7 @@ import json
 #   API_TOKEN=some-long-secret
 THREADVAULT_BASE = os.environ.get("THREADVAULT_BASE")
 API_TOKEN = os.environ.get("API_TOKEN")
+ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN")
 
 if not THREADVAULT_BASE:
     raise RuntimeError("THREADVAULT_BASE env var is required")
@@ -35,10 +36,10 @@ GIT_BRANCH = os.environ.get("GIT_BRANCH", "main")
 app = FastAPI(title="ThreadVault Bridge", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://chat.openai.com", "https://chatgpt.com"],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 # -------- Auth --------
@@ -49,6 +50,16 @@ def require_auth(request: Request):
     token = auth.split(" ", 1)[1].strip()
     if token != API_TOKEN:
         raise HTTPException(status_code=403, detail="Invalid token")
+
+def require_admin_auth(request: Request):
+    auth = request.headers.get("Authorization", "")
+    if not auth.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing bearer token")
+    token = auth.split(" ", 1)[1].strip()
+    if not ADMIN_TOKEN:
+        raise HTTPException(status_code=503, detail="Admin operations disabled")
+    if token != ADMIN_TOKEN:
+        raise HTTPException(status_code=403, detail="Admin access required")
 
 # -------- Models --------
 class WriteRequest(BaseModel):
@@ -231,8 +242,8 @@ def insert_under_heading(req: InsertUnderHeadingRequest, _: None = Depends(requi
     return {"ok": True, "path": str(p.relative_to(BASE))}
 
 @app.post("/sync")
-def sync_repo(_: None = Depends(require_auth)):
-    """Pull latest from remote and report status (VPS helper)."""
+def sync_repo(_: None = Depends(require_admin_auth)):
+    """Pull latest from remote and report status (VPS helper - ADMIN ONLY)."""
     rc, out, err = run_git(["git", "fetch", GIT_REMOTE])
     rc2, out2, err2 = run_git(["git", "reset", "--hard", f"{GIT_REMOTE}/{GIT_BRANCH}"])
     if rc2 != 0:
