@@ -11,7 +11,8 @@ WORKDIR /app
 COPY tools/bridges /app/tools/bridges
 COPY system/bin /app/system/bin
 
-RUN pip install --no-cache-dir fastapi uvicorn
+COPY tools/bridges/requirements.txt /app/tools/bridges/
+RUN pip install --no-cache-dir -r tools/bridges/requirements.txt
 
 # Minimal unprivileged user
 RUN useradd -m appuser
